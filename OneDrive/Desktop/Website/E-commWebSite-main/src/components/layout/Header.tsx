@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, X, Heart } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import CategoryMenu from './CategoryMenu';
@@ -63,14 +63,6 @@ export default function Header() {
 
           {/* Navigation icons */}
           <div className="flex items-center space-x-4">
-            {/* Wishlist */}
-            <button className="p-2 text-gray-600 hover:text-blue-600 transition-colors relative group">
-              <Heart className="w-6 h-6" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                2
-              </span>
-            </button>
-
             {/* Cart */}
             <Link to="/cart" className="p-2 text-gray-600 hover:text-blue-600 transition-colors relative group">
               <ShoppingCart className="w-6 h-6" />
