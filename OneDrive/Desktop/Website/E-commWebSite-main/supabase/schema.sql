@@ -19,10 +19,14 @@ create policy "Users can view their own profile"
 create policy "Users can update their own profile"
   on public.profiles for update using (auth.uid() = id);
 
+-- is_admin() uses SECURITY DEFINER to bypass RLS and avoid infinite recursion
+create or replace function public.is_admin()
+returns boolean language sql security definer stable set search_path = public as $$
+  select public.is_admin()
+$$;
+
 create policy "Admins can view all profiles"
-  on public.profiles for select using (
-    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
-  );
+  on public.profiles for select using (public.is_admin());
 
 -- Auto-create profile on sign-up
 create or replace function public.handle_new_user()
@@ -55,7 +59,7 @@ alter table public.categories enable row level security;
 create policy "Categories are publicly visible" on public.categories for select using (true);
 create policy "Only admins can manage categories"
   on public.categories for all using (
-    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+    public.is_admin()
   );
 
 -- ─── Subcategories ────────────────────────────────────────────────────────────
@@ -71,7 +75,7 @@ alter table public.subcategories enable row level security;
 create policy "Subcategories are publicly visible" on public.subcategories for select using (true);
 create policy "Only admins can manage subcategories"
   on public.subcategories for all using (
-    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+    public.is_admin()
   );
 
 -- ─── Products ─────────────────────────────────────────────────────────────────
@@ -99,7 +103,7 @@ alter table public.products enable row level security;
 create policy "Products are publicly visible" on public.products for select using (true);
 create policy "Only admins can manage products"
   on public.products for all using (
-    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+    public.is_admin()
   );
 
 -- ─── Orders ───────────────────────────────────────────────────────────────────
@@ -128,12 +132,12 @@ create policy "Users can create orders"
 
 create policy "Admins can view all orders"
   on public.orders for select using (
-    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+    public.is_admin()
   );
 
 create policy "Admins can update orders"
   on public.orders for update using (
-    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+    public.is_admin()
   );
 
 -- ─── Order Items ──────────────────────────────────────────────────────────────
@@ -162,7 +166,7 @@ create policy "Users can create order items"
 
 create policy "Admins can view all order items"
   on public.order_items for select using (
-    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+    public.is_admin()
   );
 
 -- ─── Seed data ────────────────────────────────────────────────────────────────
