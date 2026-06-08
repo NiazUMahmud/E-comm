@@ -1,10 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   if (items.length === 0) {
     return (
@@ -125,12 +128,12 @@ export default function CartPage() {
               </div>
             </div>
 
-            <Link
-              to="/checkout"
+            <button
+              onClick={() => navigate(user ? '/checkout' : '/login?redirect=%2Fcheckout')}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors text-center block"
             >
-              Proceed to Checkout
-            </Link>
+              {user ? 'Proceed to Checkout' : 'Sign in to Checkout'}
+            </button>
 
             <div className="mt-4 text-center">
               <p className="text-xs text-gray-500">
