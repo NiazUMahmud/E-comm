@@ -22,7 +22,7 @@ create policy "Users can update their own profile"
 -- is_admin() uses SECURITY DEFINER to bypass RLS and avoid infinite recursion
 create or replace function public.is_admin()
 returns boolean language sql security definer stable set search_path = public as $$
-  select public.is_admin()
+  select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
 $$;
 
 create policy "Admins can view all profiles"
