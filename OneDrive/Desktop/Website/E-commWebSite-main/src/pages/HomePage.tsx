@@ -1,116 +1,209 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Truck, Shield, Headphones } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  ArrowRight, Truck, Shield, RefreshCw, Headphones,
+  Monitor, Shirt, Home, Dumbbell, BookOpen, Sparkles, Smile, Heart, Search, Zap,
+} from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
 import ProductCard from '../components/products/ProductCard';
 
+const categoryCards = [
+  { label: 'Electronics', href: '/products?category=electronics', icon: Monitor, bg: 'bg-blue-50', color: 'text-blue-600' },
+  { label: 'Clothing', href: '/products?category=fashion', icon: Shirt, bg: 'bg-purple-50', color: 'text-purple-600' },
+  { label: 'Home & Garden', href: '/products?category=home-garden', icon: Home, bg: 'bg-green-50', color: 'text-green-600' },
+  { label: 'Sports', href: '/products?category=sports-outdoors', icon: Dumbbell, bg: 'bg-orange-50', color: 'text-orange-500' },
+  { label: 'Books', href: '/products?category=books', icon: BookOpen, bg: 'bg-yellow-50', color: 'text-yellow-600' },
+  { label: 'Beauty', href: '/products?category=beauty', icon: Sparkles, bg: 'bg-pink-50', color: 'text-pink-500' },
+  { label: 'Toys', href: '/products?category=toys', icon: Smile, bg: 'bg-teal-50', color: 'text-teal-500' },
+  { label: 'Health', href: '/products?category=health', icon: Heart, bg: 'bg-rose-50', color: 'text-rose-500' },
+];
+
+const benefits = [
+  { icon: Truck, label: 'Free Shipping', sub: 'On orders over $50', color: 'text-blue-600', bg: 'bg-blue-50' },
+  { icon: Shield, label: 'Secure Payment', sub: '100% protected', color: 'text-green-600', bg: 'bg-green-50' },
+  { icon: RefreshCw, label: 'Easy Returns', sub: '30-day returns', color: 'text-orange-500', bg: 'bg-orange-50' },
+  { icon: Headphones, label: '24/7 Support', sub: 'Always here for you', color: 'text-purple-600', bg: 'bg-purple-50' },
+];
+
 export default function HomePage() {
   const { products, loading } = useProducts();
+  const navigate = useNavigate();
+  const [heroSearch, setHeroSearch] = useState('');
 
-  const featuredProducts = products.filter(p => p.featured);
-  const dealsOfTheDay = products.filter(p => p.originalPrice && p.originalPrice > p.price);
+  const featuredProducts = products.filter(p => p.featured).slice(0, 4);
+  const dealsOfTheDay = products.filter(p => p.originalPrice && p.originalPrice > p.price).slice(0, 4);
+
+  const handleHeroSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (heroSearch.trim()) {
+      navigate(`/products?search=${encodeURIComponent(heroSearch.trim())}`);
+    }
+  };
 
   return (
-    <div>
-      {/* Hero */}
-      <section className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-blue-600 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-20" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Discover Amazing
-              <span className="block text-yellow-400">Deals Every Day</span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
-              Shop millions of products from trusted sellers worldwide with fast, free shipping and easy returns.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/products"
-                className="bg-yellow-500 text-black px-8 py-4 rounded-lg font-semibold text-lg hover:bg-yellow-400 transition-colors inline-flex items-center justify-center"
-              >
-                Shop Now
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-              <Link
-                to="/products?featured=true"
-                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-900 transition-colors"
-              >
-                Featured Products
-              </Link>
+    <div className="bg-gray-50">
+      {/* ── Hero ──────────────────────────────────────────────────────── */}
+      <section className="bg-[#1c3557] text-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            {/* Left */}
+            <div className="space-y-6">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-[#243f6a] text-blue-200 text-sm font-medium px-4 py-2 rounded-full">
+                <Zap className="w-4 h-4 text-yellow-400" />
+                Summer Sale — Up to 60% Off
+              </div>
+
+              {/* Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+                Discover What's{' '}
+                <span className="text-blue-400">Next</span>
+              </h1>
+
+              <p className="text-blue-100 text-lg max-w-md">
+                Shop millions of products from trusted sellers worldwide. Fast shipping, easy returns, and unbeatable prices.
+              </p>
+
+              {/* Hero search */}
+              <form onSubmit={handleHeroSearch} className="flex gap-3 max-w-md">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={heroSearch}
+                    onChange={e => setHeroSearch(e.target.value)}
+                    placeholder="Search products, brands, categories..."
+                    className="w-full pl-10 pr-4 py-3 rounded-full text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="bg-white text-[#1c3557] px-5 py-3 rounded-full font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap"
+                >
+                  Search
+                </button>
+              </form>
+
+              {/* CTA buttons */}
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  to="/products"
+                  className="inline-flex items-center gap-2 bg-white text-[#1c3557] px-6 py-3 rounded-full font-semibold text-sm hover:bg-gray-100 transition-colors"
+                >
+                  Shop Now <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/products?featured=true"
+                  className="inline-flex items-center gap-2 border border-white/40 text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-white/10 transition-colors"
+                >
+                  Featured Picks
+                </Link>
+              </div>
+            </div>
+
+            {/* Right — hero image */}
+            <div className="relative hidden lg:block">
+              <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
+                <img
+                  src="https://images.pexels.com/photos/1884581/pexels-photo-1884581.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Fashion store interior"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Stat badges */}
+              <div className="absolute top-4 right-4 bg-white text-gray-900 rounded-xl px-4 py-3 shadow-lg text-center">
+                <p className="text-xs text-gray-500">Trusted Sellers</p>
+                <p className="font-bold text-sm">2K+ Brands</p>
+              </div>
+              <div className="absolute bottom-4 left-4 bg-white text-gray-900 rounded-xl px-4 py-3 shadow-lg text-center">
+                <p className="text-xs text-gray-500">Trending Now</p>
+                <p className="font-bold text-sm">50K+ Products</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 bg-white">
+      {/* ── Benefits ──────────────────────────────────────────────────── */}
+      <section className="bg-white py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Truck className="w-8 h-8 text-blue-600" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {benefits.map(({ icon: Icon, label, sub, color, bg }) => (
+              <div key={label} className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-white shadow-sm">
+                <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                  <Icon className={`w-6 h-6 ${color}`} />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">{label}</p>
+                  <p className="text-gray-500 text-xs">{sub}</p>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Free Shipping</h3>
-              <p className="text-gray-600">Free shipping on orders over $50.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Secure Shopping</h3>
-              <p className="text-gray-600">Your data is protected with industry-standard encryption.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Headphones className="w-8 h-8 text-orange-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">24/7 Support</h3>
-              <p className="text-gray-600">Get help whenever you need it.</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Featured products */}
-      <section className="py-16 bg-gray-50">
+      {/* ── Shop by Category ──────────────────────────────────────────── */}
+      <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Featured Products</h2>
-            <Link to="/products?featured=true" className="text-blue-600 hover:text-blue-800 font-medium flex items-center">
-              View All <ArrowRight className="ml-1 w-4 h-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-8">Shop by Category</h2>
+          <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+            {categoryCards.map(({ label, href, icon: Icon, bg, color }) => (
+              <Link
+                key={label}
+                to={href}
+                className="flex flex-col items-center gap-3 p-4 rounded-2xl border border-gray-100 bg-white hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
+              >
+                <div className={`w-14 h-14 ${bg} rounded-2xl flex items-center justify-center`}>
+                  <Icon className={`w-7 h-7 ${color}`} />
+                </div>
+                <span className="text-xs font-medium text-gray-700 text-center leading-tight">{label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Featured Products ─────────────────────────────────────────── */}
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-end mb-8">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Featured Products</h2>
+              <p className="text-gray-500 text-sm mt-1">Handpicked by our curators</p>
+            </div>
+            <Link to="/products?featured=true" className="text-sm font-medium text-gray-600 hover:text-blue-600 flex items-center gap-1">
+              View All <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl h-72 animate-pulse" />
-              ))}
+              {[...Array(4)].map((_, i) => <div key={i} className="bg-white rounded-2xl h-80 animate-pulse" />)}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredProducts.map(product => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} showDiscount />
               ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* Deals */}
+      {/* ── Today's Deals ─────────────────────────────────────────────── */}
       {dealsOfTheDay.length > 0 && (
-        <section className="py-16 bg-white">
+        <section className="py-12 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-end mb-8">
               <div>
-                <h2 className="text-3xl font-bold text-gray-900">Today's Deals</h2>
-                <p className="text-gray-600 mt-2">Limited time offers you don't want to miss</p>
+                <h2 className="text-2xl font-bold text-gray-900">Today's Deals</h2>
+                <p className="text-gray-500 text-sm mt-1">Limited time offers you don't want to miss</p>
               </div>
-              <Link to="/products?deals=true" className="text-red-600 hover:text-red-800 font-medium flex items-center">
-                View All Deals <ArrowRight className="ml-1 w-4 h-4" />
+              <Link to="/products?deals=true" className="text-sm font-medium text-gray-600 hover:text-red-600 flex items-center gap-1">
+                View All Deals <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {dealsOfTheDay.map(product => (
                 <ProductCard key={product.id} product={product} showDiscount />
               ))}
@@ -119,20 +212,20 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Newsletter */}
-      <section className="py-16 bg-blue-600">
+      {/* ── Newsletter ────────────────────────────────────────────────── */}
+      <section className="py-14 bg-[#1c3557]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Stay Updated</h2>
-          <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-2xl font-bold text-white mb-2">Stay Updated</h2>
+          <p className="text-blue-200 mb-8 max-w-xl mx-auto text-sm">
             Get the latest deals, new arrivals, and exclusive offers delivered to your inbox.
           </p>
-          <div className="max-w-md mx-auto flex gap-4">
+          <div className="max-w-md mx-auto flex gap-3">
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg border border-blue-400 focus:ring-2 focus:ring-white focus:border-white"
+              className="flex-1 px-4 py-3 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-            <button className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition-colors">
+            <button className="bg-white text-[#1c3557] px-6 py-3 rounded-full font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap">
               Subscribe
             </button>
           </div>

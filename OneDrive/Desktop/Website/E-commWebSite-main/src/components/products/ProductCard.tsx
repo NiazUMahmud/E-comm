@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Heart, ShoppingCart } from 'lucide-react';
+import { Star, ShoppingCart } from 'lucide-react';
 import { Product } from '../../types';
 import { useCart } from '../../contexts/CartContext';
 
@@ -19,98 +19,75 @@ export default function ProductCard({ product, showDiscount = false }: ProductCa
       name: product.name,
       price: product.price,
       image: product.images[0],
-      stock: product.stock
+      stock: product.stock,
     });
   };
 
-  const discountPercentage = product.originalPrice 
+  const discountPct = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
   return (
     <Link to={`/products/${product.id}`} className="group block">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
-        {/* Image container */}
-        <div className="relative aspect-square overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
+        {/* Image */}
+        <div className="relative aspect-square overflow-hidden bg-gray-50">
           <img
             src={product.images[0]}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          
           {/* Discount badge */}
-          {showDiscount && discountPercentage > 0 && (
-            <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
-              {discountPercentage}% OFF
+          {(showDiscount || discountPct > 0) && discountPct > 0 && (
+            <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+              -{discountPct}%
             </div>
           )}
-
-          {/* Wishlist button */}
-          <button className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-            <Heart className="w-4 h-4 text-gray-600 hover:text-red-500" />
-          </button>
-
-          {/* Quick add to cart */}
-          <button
-            onClick={handleAddToCart}
-            className="absolute bottom-3 right-3 bg-blue-600 text-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-700"
-          >
-            <ShoppingCart className="w-4 h-4" />
-          </button>
+          {/* Featured badge */}
+          {product.featured && (
+            <div className="absolute top-3 right-3 bg-blue-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+              Featured
+            </div>
+          )}
         </div>
 
         {/* Content */}
-        <div className="p-4">
-          <div className="mb-2">
-            <p className="text-xs text-gray-500 uppercase tracking-wide">{product.brand}</p>
-            <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-              {product.name}
-            </h3>
-          </div>
+        <div className="p-4 flex flex-col gap-2">
+          <p className="text-xs text-gray-400 uppercase tracking-widest font-medium">{product.brand}</p>
+          <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
+            {product.name}
+          </h3>
 
-          {/* Rating */}
-          <div className="flex items-center space-x-1 mb-3">
-            <div className="flex items-center">
+          {/* Stars */}
+          <div className="flex items-center gap-1">
+            <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-4 h-4 ${
-                    i < Math.floor(product.rating)
-                      ? 'text-yellow-400 fill-current'
-                      : 'text-gray-300'
-                  }`}
+                  className={`w-3.5 h-3.5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'}`}
                 />
               ))}
             </div>
-            <span className="text-sm text-gray-600">
-              {product.rating} ({product.reviewCount})
-            </span>
+            <span className="text-xs text-gray-500">({product.reviewCount})</span>
           </div>
 
           {/* Price */}
-          <div className="flex items-center space-x-2 mb-3">
-            <span className="text-xl font-bold text-gray-900">
-              ${product.price}
-            </span>
+          <div className="flex items-baseline gap-2">
+            <span className="text-lg font-bold text-gray-900">${product.price.toFixed(2)}</span>
             {product.originalPrice && (
-              <span className="text-sm text-gray-500 line-through">
-                ${product.originalPrice}
-              </span>
+              <span className="text-sm text-gray-400 line-through">${product.originalPrice.toFixed(2)}</span>
             )}
           </div>
 
-          {/* Stock status */}
-          <div className="flex items-center justify-between">
-            <span className={`text-xs px-2 py-1 rounded-full ${
-              product.stock > 10
-                ? 'bg-green-100 text-green-800'
-                : product.stock > 0
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-red-100 text-red-800'
-            }`}>
-              {product.stock > 10 ? 'In Stock' : product.stock > 0 ? 'Low Stock' : 'Out of Stock'}
-            </span>
-          </div>
+          {/* Add to Cart */}
+          <button
+            onClick={handleAddToCart}
+            disabled={product.stock === 0}
+            className="mt-1 w-full flex items-center justify-center gap-2 bg-[#1c3557] text-white py-2.5 rounded-full text-sm font-semibold hover:bg-[#16293f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <ShoppingCart className="w-4 h-4" />
+            {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+          </button>
         </div>
       </div>
     </Link>
