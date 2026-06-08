@@ -60,6 +60,16 @@ export default function Header() {
 
           {/* Right icons */}
           <div className="flex items-center space-x-1 ml-auto md:ml-0">
+            {/* Admin shortcut */}
+            {user?.role === 'admin' && (
+              <Link
+                to="/admin"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#1c3557] text-white text-sm font-medium rounded-lg hover:bg-[#162843] transition-colors mr-1"
+              >
+                Admin
+              </Link>
+            )}
+
             {/* Account */}
             <div className="relative group">
               <button className="flex items-center space-x-1.5 px-2 py-2 text-gray-600 hover:text-blue-600 transition-colors">
