@@ -20,8 +20,15 @@ export default function LoginPage() {
     try {
       await login(email, password);
       navigate(redirect);
-    } catch (err) {
-      setError('Invalid email or password');
+    } catch (err: any) {
+      const msg: string = err?.message ?? '';
+      if (msg.toLowerCase().includes('email not confirmed')) {
+        setError('Please confirm your email address first. Check your inbox for a confirmation link.');
+      } else if (msg.toLowerCase().includes('invalid login')) {
+        setError('Invalid email or password.');
+      } else {
+        setError(msg || 'Sign in failed. Please try again.');
+      }
     }
   };
 

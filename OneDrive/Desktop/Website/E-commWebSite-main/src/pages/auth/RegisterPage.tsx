@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -12,8 +12,8 @@ export default function RegisterPage() {
     confirmPassword: ''
   });
   const [error, setError] = useState('');
+  const [registered, setRegistered] = useState(false);
   const { register, loading } = useAuth();
-  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -38,11 +38,30 @@ export default function RegisterPage() {
 
     try {
       await register(formData.email, formData.password, formData.name);
-      navigate('/');
-    } catch (err) {
-      setError('Registration failed. Please try again.');
+      setRegistered(true);
+    } catch (err: any) {
+      setError(err?.message || 'Registration failed. Please try again.');
     }
   };
+
+  if (registered) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">✉️</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h2>
+          <p className="text-gray-600 mb-6">
+            We sent a confirmation link to <strong>{formData.email}</strong>. Click it to activate your account, then come back to sign in.
+          </p>
+          <Link to="/login" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+            Go to Sign In
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
