@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BarChart3, Users, Package, DollarSign, TrendingUp, Plus, Pencil, Trash2, ChevronDown } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { BarChart3, Package, DollarSign, TrendingUp, Plus, Pencil, Trash2, ChevronDown, Upload, X, Image } from 'lucide-react';
 import { useProducts } from '../../hooks/useProducts';
 import { useAllOrders, updateOrderStatus } from '../../hooks/useOrders';
 import { supabase } from '../../lib/supabase';
@@ -17,12 +17,12 @@ function ProductModal({
   onSaved: () => void;
 }) {
   const isEdit = !!product?.id;
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     name: product?.name ?? '',
     description: product?.description ?? '',
     price: product?.price?.toString() ?? '',
     original_price: product?.originalPrice?.toString() ?? '',
-    images: product?.images?.join(', ') ?? '',
     category: product?.category ?? '',
     subcategory: product?.subcategory ?? '',
     brand: product?.brand ?? '',
@@ -30,8 +30,34 @@ function ProductModal({
     featured: product?.featured ?? false,
     tags: product?.tags?.join(', ') ?? '',
   });
+  const [images, setImages] = useState<string[]>(product?.images ?? []);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    setUploading(true);
+    setError('');
+    const uploaded: string[] = [];
+    for (const file of files) {
+      const ext = file.name.split('.').pop();
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from('product-images')
+        .upload(path, file, { upsert: false });
+      if (upErr) { setError(`Upload failed: ${upErr.message}`); break; }
+      const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+      uploaded.push(data.publicUrl);
+    }
+    setImages(prev => [...prev, ...uploaded]);
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const removeImage = (idx: number) =>
+    setImages(prev => prev.filter((_, i) => i !== idx));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,20 +69,19 @@ function ProductModal({
       description: form.description,
       price: parseFloat(form.price),
       original_price: form.original_price ? parseFloat(form.original_price) : null,
-      images: form.images.split(',').map(s => s.trim()).filter(Boolean),
+      images,
       category: form.category,
       subcategory: form.subcategory || null,
       brand: form.brand,
       stock: parseInt(form.stock),
       featured: form.featured,
       tags: form.tags.split(',').map(s => s.trim()).filter(Boolean),
-      specifications: product?.specifications ?? {},
-      updated_at: new Date().toISOString(),
+      specifications: (product?.specifications ?? {}) as Record<string, string>,
     };
 
     const { error: err } = isEdit
-      ? await supabase.from('products').update(payload).eq('id', product!.id!)
-      : await supabase.from('products').insert(payload);
+      ? await supabase.from('products').update(payload as any).eq('id', product!.id!)
+      : await supabase.from('products').insert(payload as any);
 
     if (err) {
       setError(err.message);
@@ -74,6 +99,55 @@ function ProductModal({
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
+          {/* ── Image upload ── */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
+            {/* Previews */}
+            {images.length > 0 && (
+              <div className="flex flex-wrap gap-3 mb-3">
+                {images.map((url, idx) => (
+                  <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 group">
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                    >
+                      <X className="w-5 h-5 text-white" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {/* Upload button */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleImageUpload}
+            />
+            <button
+              type="button"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 border-2 border-dashed border-gray-300 hover:border-blue-400 text-gray-500 hover:text-blue-600 rounded-lg px-4 py-3 w-full justify-center transition-colors disabled:opacity-50"
+            >
+              {uploading ? (
+                <><div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /> Uploading...</>
+              ) : (
+                <><Upload className="w-4 h-4" /> Click to upload images (JPG, PNG, WebP)</>
+              )}
+            </button>
+            {images.length === 0 && (
+              <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                <Image className="w-3 h-3" /> No images yet — upload at least one
+              </p>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
@@ -111,12 +185,18 @@ function ProductModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-              <input required value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" />
+              <select required value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                <option value="">Select category</option>
+                {['Electronics','Fashion','Home & Garden','Sports & Outdoors','Books','Beauty','Toys','Health'].map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
               <input value={form.subcategory} onChange={e => setForm(p => ({ ...p, subcategory: e.target.value }))}
+                placeholder="e.g. Laptops, Jackets..."
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" />
             </div>
           </div>
@@ -128,7 +208,7 @@ function ProductModal({
                 onChange={e => setForm(p => ({ ...p, stock: e.target.value }))}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" />
             </div>
-            <div className="flex items-end">
+            <div className="flex items-end pb-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={form.featured}
                   onChange={e => setForm(p => ({ ...p, featured: e.target.checked }))}
@@ -136,13 +216,6 @@ function ProductModal({
                 <span className="text-sm font-medium text-gray-700">Featured product</span>
               </label>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Image URLs (comma-separated)</label>
-            <input value={form.images} onChange={e => setForm(p => ({ ...p, images: e.target.value }))}
-              placeholder="https://example.com/image1.jpg, https://..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" />
           </div>
 
           <div>
@@ -159,7 +232,7 @@ function ProductModal({
               className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors">
               Cancel
             </button>
-            <button type="submit" disabled={saving}
+            <button type="submit" disabled={saving || uploading}
               className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors">
               {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Add Product'}
             </button>
