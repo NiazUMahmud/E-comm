@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { User, Package, Heart, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useMyOrders } from '../hooks/useOrders';
+import { supabase } from '../lib/supabase';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
@@ -16,6 +17,22 @@ export default function ProfilePage() {
   const { user, logout } = useAuth();
   const { orders, loading: ordersLoading } = useMyOrders(user?.id);
   const [activeTab, setActiveTab] = useState('profile');
+  const [name, setName] = useState(user?.name ?? '');
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState('');
+
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+    setSaveMsg('');
+    const { error } = await supabase
+      .from('profiles')
+      .update({ name })
+      .eq('id', user.id);
+    setSaving(false);
+    setSaveMsg(error ? `Error: ${error.message}` : 'Changes saved successfully!');
+    setTimeout(() => setSaveMsg(''), 3000);
+  };
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -82,7 +99,8 @@ export default function ProfilePage() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
                       <input
                         type="text"
-                        defaultValue={user?.name ?? ''}
+                        value={name}
+                        onChange={e => setName(e.target.value)}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
@@ -104,8 +122,17 @@ export default function ProfilePage() {
                       {user?.role === 'admin' ? 'Administrator' : 'Customer'}
                     </span>
                   </div>
-                  <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                    Save Changes
+                  {saveMsg && (
+                    <p className={`text-sm font-medium ${saveMsg.startsWith('Error') ? 'text-red-600' : 'text-green-600'}`}>
+                      {saveMsg}
+                    </p>
+                  )}
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  >
+                    {saving ? 'Saving...' : 'Save Changes'}
                   </button>
                 </div>
               </div>
