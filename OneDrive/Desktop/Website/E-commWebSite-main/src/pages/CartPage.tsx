@@ -1,5 +1,5 @@
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -32,6 +32,11 @@ export default function CartPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Helmet>
+        <title>Your Cart — EComm</title>
+        <meta name="description" content="Review your shopping cart and proceed to checkout on EComm." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="flex items-center mb-8">
         <Link
           to="/products"

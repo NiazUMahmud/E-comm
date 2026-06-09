@@ -20,6 +20,41 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="EComm" />
+    <meta property="og:url" content="https://ecommnexora.netlify.app/" />
+    <meta property="og:image" content="https://ecommnexora.netlify.app/og-image.png" />
+    <meta name="twitter:image" content="https://ecommnexora.netlify.app/og-image.png" />
+    <link rel="canonical" href="https://ecommnexora.netlify.app/" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://ecommnexora.netlify.app/#organization",
+          "name": "EComm",
+          "url": "https://ecommnexora.netlify.app",
+          "description": "Online marketplace offering electronics, clothing, home & garden, sports, books, beauty, toys, and health products.",
+          "sameAs": []
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://ecommnexora.netlify.app/#website",
+          "url": "https://ecommnexora.netlify.app",
+          "name": "EComm",
+          "description": "Discover millions of products from trusted sellers worldwide. Fast shipping, easy returns, unbeatable prices.",
+          "publisher": { "@id": "https://ecommnexora.netlify.app/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://ecommnexora.netlify.app/products?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

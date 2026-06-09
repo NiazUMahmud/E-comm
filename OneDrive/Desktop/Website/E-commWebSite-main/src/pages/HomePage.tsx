@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, Truck, Shield, RefreshCw, Headphones,
@@ -40,8 +41,26 @@ export default function HomePage() {
     }
   };
 
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'EComm — Online Shopping',
+    url: 'https://ecommnexora.netlify.app/',
+    description: 'Discover millions of products from trusted sellers worldwide.',
+  });
+
   return (
-    <div className="bg-gray-50">
+    <>
+      <Helmet>
+        <title>EComm — Shop Electronics, Fashion, Home &amp; More</title>
+        <meta name="description" content="Discover millions of products from trusted sellers worldwide. Shop electronics, fashion, home & garden, sports and more with fast shipping and easy returns." />
+        <link rel="canonical" href="https://ecommnexora.netlify.app/" />
+        <meta property="og:title" content="EComm — Shop Electronics, Fashion, Home & More" />
+        <meta property="og:description" content="Shop millions of products from trusted sellers. Fast shipping, easy returns, unbeatable prices." />
+        <meta property="og:url" content="https://ecommnexora.netlify.app/" />
+        <script type="application/ld+json">{jsonLd}</script>
+      </Helmet>
+      <div className="bg-gray-50">
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section className="bg-[#1c3557] text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
@@ -231,6 +250,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

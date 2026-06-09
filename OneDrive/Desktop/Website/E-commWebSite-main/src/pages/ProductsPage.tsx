@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Grid, List, SlidersHorizontal } from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
 import ProductCard from '../components/products/ProductCard';
@@ -49,7 +50,28 @@ export default function ProductsPage() {
     return filtered;
   }, [products, searchParams, sortBy]);
 
+  const activeCategory = searchParams.get('category');
+  const activeSearch = searchParams.get('search');
+  const pageTitle = activeSearch
+    ? `Search: "${activeSearch}" — EComm`
+    : activeCategory
+    ? `${activeCategory.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} — EComm`
+    : 'All Products — EComm';
+  const pageDesc = activeSearch
+    ? `Shop results for "${activeSearch}" on EComm.`
+    : activeCategory
+    ? `Browse ${activeCategory.replace(/-/g, ' ')} products on EComm. Fast shipping, easy returns.`
+    : 'Shop thousands of products across electronics, clothing, home, sports and more.';
+
   return (
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <link rel="canonical" href="https://ecommnexora.netlify.app/products" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+      </Helmet>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
         <span>Home</span><span>/</span><span>Products</span>
@@ -139,5 +161,6 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

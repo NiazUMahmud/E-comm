@@ -1,0 +1,37 @@
+# EComm
+
+> EComm is an online marketplace offering electronics, clothing, home & garden, sports equipment, books, beauty products, toys, and health items. Shop from trusted sellers with fast shipping, easy returns, and secure checkout.
+
+## About
+EComm is a modern e-commerce platform where customers can browse and purchase products across 8 major categories. Payments are processed securely via Stripe. Free shipping on orders over $50.
+
+## Product Categories
+- **Electronics**: Smartphones, laptops, headphones, tablets, cameras
+- **Clothing**: Men's and women's fashion, casual wear, outerwear
+- **Home & Garden**: Furniture, decor, kitchen, garden tools
+- **Sports & Outdoors**: Fitness equipment, outdoor gear, activewear
+- **Books**: Fiction, non-fiction, educational, reference
+- **Beauty**: Skincare, makeup, haircare, fragrances
+- **Toys**: Children's toys, games, educational toys
+- **Health**: Supplements, medical devices, wellness products
+
+## Key Features
+- Secure Stripe-powered checkout
+- User accounts with order history
+- Free shipping on orders over $50
+- 30-day easy returns
+- 24/7 customer support
+- Mobile-friendly design
+
+## Pages
+- Homepage: https://ecommnexora.netlify.app/
+- All Products: https://ecommnexora.netlify.app/products
+- Electronics: https://ecommnexora.netlify.app/products?category=electronics
+- Clothing: https://ecommnexora.netlify.app/products?category=fashion
+- Register: https://ecommnexora.netlify.app/register
+- Sign In: https://ecommnexora.netlify.app/login
+- Terms of Service: https://ecommnexora.netlify.app/terms
+- Privacy Policy: https://ecommnexora.netlify.app/privacy
+
+## Contact
+Website: https://ecommnexora.netlify.app

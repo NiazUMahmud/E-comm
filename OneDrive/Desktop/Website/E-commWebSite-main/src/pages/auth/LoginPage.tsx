@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -34,6 +35,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <Helmet>
+        <title>Sign In — EComm</title>
+        <meta name="description" content="Sign in to your EComm account to track orders, manage your profile and checkout faster." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="max-w-md w-full">
         <div className="bg-white rounded-lg shadow-lg p-8">
           {/* Header */}

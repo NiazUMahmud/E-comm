@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Star, Heart, ShoppingCart, Truck, Shield, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useProduct } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
@@ -41,8 +42,39 @@ export default function ProductDetailPage() {
     }
   };
 
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description,
+    image: product.images,
+    brand: { '@type': 'Brand', name: product.brand },
+    offers: {
+      '@type': 'Offer',
+      price: product.price,
+      priceCurrency: 'USD',
+      availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: `https://ecommnexora.netlify.app/products/${product.id}`,
+    },
+    aggregateRating: product.reviewCount > 0 ? {
+      '@type': 'AggregateRating',
+      ratingValue: product.rating,
+      reviewCount: product.reviewCount,
+    } : undefined,
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Helmet>
+        <title>{product.name} — EComm</title>
+        <meta name="description" content={`${product.description.slice(0, 155)}...`} />
+        <link rel="canonical" href={`https://ecommnexora.netlify.app/products/${product.id}`} />
+        <meta property="og:title" content={`${product.name} — EComm`} />
+        <meta property="og:description" content={product.description.slice(0, 155)} />
+        <meta property="og:type" content="product" />
+        {product.images[0] && <meta property="og:image" content={product.images[0]} />}
+        <script type="application/ld+json">{jsonLd}</script>
+      </Helmet>
       <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
         <Link to="/" className="hover:text-blue-600">Home</Link>
         <span>/</span>

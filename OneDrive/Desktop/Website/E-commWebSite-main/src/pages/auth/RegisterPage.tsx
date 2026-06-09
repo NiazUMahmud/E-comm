@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -65,6 +66,11 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <Helmet>
+        <title>Create Account — EComm</title>
+        <meta name="description" content="Create a free EComm account to shop millions of products with fast shipping and easy returns." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="max-w-md w-full">
         <div className="bg-white rounded-lg shadow-lg p-8">
           {/* Header */}
@@ -178,9 +184,9 @@ export default function RegisterPage() {
               />
               <label htmlFor="terms" className="ml-2 text-sm text-gray-700">
                 I agree to the{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-800">Terms of Service</a>
+                <Link to="/terms" className="text-blue-600 hover:text-blue-800">Terms of Service</Link>
                 {' '}and{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-800">Privacy Policy</a>
+                <Link to="/privacy" className="text-blue-600 hover:text-blue-800">Privacy Policy</Link>
               </label>
             </div>
 
