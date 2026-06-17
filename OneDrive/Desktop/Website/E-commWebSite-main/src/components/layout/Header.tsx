@@ -5,14 +5,14 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 
 const categories = [
-  { label: 'Electronics', href: '/products?category=electronics' },
-  { label: 'Clothing', href: '/products?category=fashion' },
-  { label: 'Home & Garden', href: '/products?category=home-garden' },
-  { label: 'Sports', href: '/products?category=sports-outdoors' },
-  { label: 'Books', href: '/products?category=books' },
-  { label: 'Beauty', href: '/products?category=beauty' },
-  { label: 'Toys', href: '/products?category=toys' },
-  { label: 'Health', href: '/products?category=health' },
+  { label: 'Electronics & Other', href: '/products?category=electronics-other' },
+  { label: 'Hot Wheels', href: '/products?category=hot-wheels' },
+  { label: 'Lego', href: '/products?category=lego' },
+  { label: 'Funko Pop', href: '/products?category=funko-pop' },
+  // { label: 'Books', href: '/products?category=books' },
+  // { label: 'Beauty', href: '/products?category=beauty' },
+  // { label: 'Toys', href: '/products?category=toys' },
+  // { label: 'Health', href: '/products?category=health' },
 ];
 
 export default function Header() {
