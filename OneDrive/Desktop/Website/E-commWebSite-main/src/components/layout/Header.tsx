@@ -5,11 +5,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 
 const categories = [
-  { label: 'Electronics & Other', href: '/products?category=electronics-other' },
   { label: 'Hot Wheels', href: '/products?category=hot-wheels' },
   { label: 'Lego', href: '/products?category=lego' },
   { label: 'Funko Pop', href: '/products?category=funko-pop' },
-  // { label: 'Books', href: '/products?category=books' },
+  { label: 'Electronics & Other', href: '/products?category=electronics-other' },
+  { label: 'Tire', href: '/products?category=tires' },
   // { label: 'Beauty', href: '/products?category=beauty' },
   // { label: 'Toys', href: '/products?category=toys' },
   // { label: 'Health', href: '/products?category=health' },
