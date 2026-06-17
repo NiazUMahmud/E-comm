@@ -1,15 +1,29 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import * as Icons from 'lucide-react';
-import { categories } from '../../data/mockData';
+import { useCategories } from '../../hooks/useCategories';
 
 export default function CategoryMenu() {
+  const { categories, loading } = useCategories();
+
+  if (loading) {
+    return (
+      <div className="absolute top-full left-0 mt-1 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-4 z-50">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="px-4 py-3 flex items-center space-x-3">
+            <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded w-32 animate-pulse" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="absolute top-full left-0 mt-1 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-4 z-50">
       <div className="grid grid-cols-1 gap-1">
         {categories.map((category) => {
-          const IconComponent = Icons[category.icon as keyof typeof Icons] as React.ComponentType<any>;
-          
+          const IconComponent = (Icons[category.icon as keyof typeof Icons] ?? Icons.Tag) as React.ComponentType<{ className?: string }>;
+
           return (
             <div key={category.id} className="px-4 py-2 hover:bg-gray-50 group">
               <Link
@@ -21,10 +35,12 @@ export default function CategoryMenu() {
                   <div className="font-medium text-gray-900 group-hover:text-blue-600">
                     {category.name}
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {category.subcategories.slice(0, 2).map(sub => sub.name).join(', ')}
-                    {category.subcategories.length > 2 && '...'}
-                  </div>
+                  {category.subcategories.length > 0 && (
+                    <div className="text-xs text-gray-500">
+                      {category.subcategories.slice(0, 2).map(sub => sub.name).join(', ')}
+                      {category.subcategories.length > 2 && '…'}
+                    </div>
+                  )}
                 </div>
               </Link>
             </div>

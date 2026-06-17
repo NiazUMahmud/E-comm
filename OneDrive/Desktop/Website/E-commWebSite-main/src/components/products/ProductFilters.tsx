@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { categories } from '../../data/mockData';
+import { useCategories } from '../../hooks/useCategories';
 
 export default function ProductFilters() {
+  const { categories } = useCategories();
   const [searchParams, setSearchParams] = useSearchParams();
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
