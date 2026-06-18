@@ -1,10 +1,10 @@
-import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { CheckCircle, Package, ArrowRight } from 'lucide-react';
+import { CheckCircle, Package, ArrowRight, UserPlus } from 'lucide-react';
 
 export default function CheckoutSuccessPage() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('order');
+  const isGuest = searchParams.get('guest') === 'true';
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
@@ -23,7 +23,7 @@ export default function CheckoutSuccessPage() {
         </p>
       )}
 
-      <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-8 text-left">
+      <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-6 text-left">
         <div className="flex items-center gap-3 mb-3">
           <Package className="w-5 h-5 text-blue-600" />
           <h3 className="font-semibold text-gray-900">What happens next?</h3>
@@ -31,18 +31,39 @@ export default function CheckoutSuccessPage() {
         <ul className="space-y-2 text-sm text-gray-600">
           <li>• You will receive a confirmation email shortly</li>
           <li>• Your order will be processed within 1 business day</li>
-          <li>• You can track your order in your profile page</li>
+          {!isGuest && <li>• You can track your order in your profile page</li>}
         </ul>
       </div>
 
+      {isGuest && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8 text-left">
+          <div className="flex items-center gap-3 mb-2">
+            <UserPlus className="w-5 h-5 text-amber-600" />
+            <h3 className="font-semibold text-gray-900">Want to track your order?</h3>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            Create a free account to view order history, track shipments, and check out faster next time.
+          </p>
+          <Link
+            to="/register"
+            className="inline-flex items-center gap-2 bg-amber-500 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-amber-600 transition-colors text-sm"
+          >
+            <UserPlus className="w-4 h-4" />
+            Create Free Account
+          </Link>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <Link
-          to="/profile"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-        >
-          View My Orders
-          <ArrowRight className="w-4 h-4" />
-        </Link>
+        {!isGuest && (
+          <Link
+            to="/profile"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+          >
+            View My Orders
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        )}
         <Link
           to="/products"
           className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"

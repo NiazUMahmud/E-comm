@@ -5,14 +5,8 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  // Require authenticated user
-  const authHeader = event.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { statusCode: 401, body: JSON.stringify({ error: 'Authentication required' }) };
-  }
-
   try {
-    const { items, currency = 'usd' } = JSON.parse(event.body);
+    const { items, currency = 'usd', customerEmail } = JSON.parse(event.body);
 
     if (!Array.isArray(items) || items.length === 0) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Cart is empty' }) };
@@ -57,11 +51,24 @@ exports.handler = async (event) => {
     if (total > 99999) return { statusCode: 400, body: JSON.stringify({ error: 'Order total exceeds limit' }) };
 
     const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-    const paymentIntent = await stripe.paymentIntents.create({
+
+    const intentParams = {
       amount: Math.round(total * 100),
       currency,
       automatic_payment_methods: { enabled: true },
-    });
+      metadata: {
+        itemCount: String(items.length),
+        customerEmail: customerEmail || '',
+      },
+    };
+
+    // receipt_email tells Stripe to send its own payment receipt and
+    // is also read by the webhook to send our custom confirmation email
+    if (customerEmail) {
+      intentParams.receipt_email = customerEmail;
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create(intentParams);
 
     return {
       statusCode: 200,

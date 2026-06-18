@@ -101,16 +101,18 @@ export default function CheckoutPage() {
     setLoadingIntent(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Please sign in to complete your purchase');
+
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
 
       const res = await fetch('/.netlify/functions/create-payment-intent', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
+        headers,
         body: JSON.stringify({
           items: items.map(i => ({ id: i.id, quantity: i.quantity })),
+          customerEmail: shippingInfo.email,
         }),
       });
       const data = await res.json();
@@ -142,7 +144,7 @@ export default function CheckoutPage() {
         navigate(`/checkout/success?order=${orderId}`);
       } else {
         clearCart();
-        navigate('/checkout/success');
+        navigate('/checkout/success?guest=true');
       }
     } catch (err: any) {
       alert(`Order saving failed: ${err.message}`);

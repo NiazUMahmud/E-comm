@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Grid, List, SlidersHorizontal } from 'lucide-react';
@@ -12,6 +12,11 @@ export default function ProductsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('relevance');
   const { products, loading } = useProducts();
+
+  const availableBrands = useMemo(() => {
+    const brands = new Set(products.map(p => p.brand).filter(Boolean));
+    return Array.from(brands).sort();
+  }, [products]);
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
@@ -38,6 +43,22 @@ export default function ProductsPage() {
 
     if (searchParams.get('deals') === 'true') {
       filtered = filtered.filter(p => p.originalPrice && p.originalPrice > p.price);
+    }
+
+    const price = searchParams.get('price');
+    if (price === 'under-50')   filtered = filtered.filter(p => p.price < 50);
+    else if (price === '50-100')  filtered = filtered.filter(p => p.price >= 50 && p.price <= 100);
+    else if (price === '100-500') filtered = filtered.filter(p => p.price > 100 && p.price <= 500);
+    else if (price === 'over-500') filtered = filtered.filter(p => p.price > 500);
+
+    const minRating = Number(searchParams.get('minRating'));
+    if (minRating >= 1 && minRating <= 5) {
+      filtered = filtered.filter(p => p.rating >= minRating);
+    }
+
+    const brand = searchParams.get('brand');
+    if (brand) {
+      filtered = filtered.filter(p => p.brand === brand);
     }
 
     switch (sortBy) {
@@ -127,7 +148,7 @@ export default function ProductsPage() {
 
       <div className="flex gap-8">
         <aside className={`lg:block lg:w-64 flex-shrink-0 ${showFilters ? 'block' : 'hidden'}`}>
-          <ProductFilters />
+          <ProductFilters availableBrands={availableBrands} />
         </aside>
 
         <div className="flex-1">
