@@ -3,20 +3,17 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, Truck, Shield, RefreshCw, Headphones,
-  Monitor, Shirt, Home, Dumbbell, BookOpen, Sparkles, Smile, Heart, Search, Zap,Tire,Lego,ToyCar,
+  Monitor, Sparkles, Smile, Search, Zap, Car, ToyBrick, CircleDot, Gem,
 } from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
 import ProductCard from '../components/products/ProductCard';
 
 const categoryCards = [
-  { label: 'Electronics & Other', href: '/products?category=electronics&other', icon: Monitor, bg: 'bg-blue-50', color: 'text-blue-600' },
- // { label: 'Clothing', href: '/products?category=fashion', icon: Shirt, bg: 'bg-purple-50', color: 'text-purple-600' },
-  //{ label: 'Home & Garden', href: '/products?category=home-garden', icon: Home, bg: 'bg-green-50', color: 'text-green-600' },
-  //{ label: 'Sports', href: '/products?category=sports-outdoors', icon: Dumbbell, bg: 'bg-orange-50', color: 'text-orange-500' },
-  { label: 'Hot Wheels', href: '/products?category=how wheels', icon: ToyCar, bg: 'bg-yellow-50', color: 'text-yellow-600' },
-  { label: 'Lego', href: '/products?category=lego', icon: Lego, bg: 'bg-pink-50', color: 'text-pink-500' },
-  { label: 'Funko Pop', href: '/products?category=toys', icon: Smile, bg: 'bg-teal-50', color: 'text-teal-500' },
-  { label: 'Tire', href: '/products?category=health', icon: Tire, bg: 'bg-rose-50', color: 'text-rose-500' },
+  { label: 'Electronics & Other', href: '/products?category=electronics-other', icon: Monitor, bg: 'bg-blue-50', color: 'text-blue-600' },
+  { label: 'Hot Wheels', href: '/products?category=hot-wheels', icon: Car, bg: 'bg-yellow-50', color: 'text-yellow-600' },
+  { label: 'Lego', href: '/products?category=lego', icon: ToyBrick, bg: 'bg-pink-50', color: 'text-pink-500' },
+  { label: 'Funko Pop', href: '/products?category=funko-pop', icon: Gem, bg: 'bg-teal-50', color: 'text-teal-500' },
+  { label: 'Tire', href: '/products?category=tires', icon: CircleDot, bg: 'bg-rose-50', color: 'text-rose-500' },
 ];
 
 const benefits = [
