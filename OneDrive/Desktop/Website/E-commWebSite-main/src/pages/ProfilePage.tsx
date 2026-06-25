@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { User, Package, Heart, Settings, LogOut } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { User, Package, Heart, Settings, LogOut, Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useMyOrders } from '../hooks/useOrders';
 import { supabase } from '../lib/supabase';
@@ -15,23 +15,57 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const { orders, loading: ordersLoading } = useMyOrders(user?.id);
   const [activeTab, setActiveTab] = useState('profile');
   const [name, setName] = useState(user?.name ?? '');
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState('');
 
+  // Delete account state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteInput, setDeleteInput] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
     setSaveMsg('');
-    const { error } = await supabase
-      .from('profiles')
+    // Supabase types not generated for this project — cast to any to allow update
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from('profiles') as any)
       .update({ name })
       .eq('id', user.id);
     setSaving(false);
     setSaveMsg(error ? `Error: ${error.message}` : 'Changes saved successfully!');
     setTimeout(() => setSaveMsg(''), 3000);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('No active session — please log in again.');
+
+      const res = await fetch('/.netlify/functions/delete-account', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Failed to delete account.');
+
+      // Use scope:'local' so we only clear localStorage — a normal signOut() would try
+      // to revoke the token on the server, fail (user is deleted), and may leave the
+      // session cached in the browser, making the user appear still logged in.
+      await supabase.auth.signOut({ scope: 'local' });
+      navigate('/');
+    } catch (err: any) {
+      setDeleteError(err.message);
+      setDeleting(false);
+    }
   };
 
   const tabs = [
@@ -207,8 +241,16 @@ export default function ProfilePage() {
                   </div>
                   <div className="border border-red-200 rounded-lg p-4 bg-red-50">
                     <h3 className="font-medium text-red-900 mb-1">Delete Account</h3>
-                    <p className="text-sm text-red-700 mb-3">Permanently delete your account and all associated data.</p>
-                    <button className="text-sm text-red-600 hover:text-red-800 font-medium">Delete account</button>
+                    <p className="text-sm text-red-700 mb-3">
+                      Permanently delete your account and all associated data. This action cannot be undone.
+                    </p>
+                    <button
+                      onClick={() => { setDeleteInput(''); setDeleteError(''); setShowDeleteModal(true); }}
+                      className="inline-flex items-center gap-2 text-sm bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete my account
+                    </button>
                   </div>
                 </div>
               </div>
@@ -216,6 +258,58 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Delete confirmation modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900">Delete Account</h2>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-4">
+              This will permanently delete your account, profile, and all order history.
+              <strong className="text-gray-900"> This cannot be undone.</strong>
+            </p>
+
+            <p className="text-sm text-gray-700 mb-2">
+              Type <span className="font-mono font-bold text-red-600">DELETE</span> to confirm:
+            </p>
+            <input
+              type="text"
+              value={deleteInput}
+              onChange={e => setDeleteInput(e.target.value)}
+              placeholder="DELETE"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4"
+            />
+
+            {deleteError && (
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3 mb-4">{deleteError}</p>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleting}
+                className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteInput !== 'DELETE' || deleting}
+                className="flex-1 bg-red-600 text-white py-2.5 rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                {deleting ? 'Deleting...' : 'Delete Account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

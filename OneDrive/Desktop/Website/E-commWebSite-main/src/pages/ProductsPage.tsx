@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Grid, List, SlidersHorizontal } from 'lucide-react';
 import { useProducts } from '../hooks/useProducts';
@@ -95,7 +95,9 @@ export default function ProductsPage() {
       </Helmet>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-        <span>Home</span><span>/</span><span>Products</span>
+        <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
+        <span>/</span>
+        <span>Products</span>
       </nav>
 
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-8">

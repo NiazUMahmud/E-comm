@@ -28,10 +28,10 @@ export default function ProductCard({ product, showDiscount = false }: ProductCa
     : 0;
 
   return (
-    <Link to={`/products/${product.id}`} className="group block">
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
+    <Link to={`/products/${product.id}`} className="group block h-full">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col">
         {/* Image */}
-        <div className="relative aspect-square overflow-hidden bg-gray-50">
+        <div className="relative aspect-square overflow-hidden bg-gray-50 flex-shrink-0">
           <img
             src={product.images[0]}
             alt={product.name}
@@ -52,7 +52,7 @@ export default function ProductCard({ product, showDiscount = false }: ProductCa
         </div>
 
         {/* Content */}
-        <div className="p-4 flex flex-col gap-2">
+        <div className="p-4 flex flex-col gap-2 flex-1">
           <p className="text-xs text-gray-400 uppercase tracking-widest font-medium">{product.brand}</p>
           <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
             {product.name}
@@ -83,7 +83,7 @@ export default function ProductCard({ product, showDiscount = false }: ProductCa
           <button
             onClick={handleAddToCart}
             disabled={product.stock === 0}
-            className="mt-1 w-full flex items-center justify-center gap-2 bg-[#1c3557] text-white py-2.5 rounded-full text-sm font-semibold hover:bg-[#16293f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="mt-auto w-full flex items-center justify-center gap-2 bg-[#1c3557] text-white py-2.5 rounded-full text-sm font-semibold hover:bg-[#16293f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ShoppingCart className="w-4 h-4" />
             {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
